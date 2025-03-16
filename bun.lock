@@ -1,0 +1,19 @@
+{
+  "lockfileVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "wakeonlan",
+      "dependencies": {
+        "dgram": "^1.0.1",
+        "wake_on_lan": "^1.0.0",
+      },
+    },
+  },
+  "packages": {
+    "dgram": ["dgram@1.0.1", "", {}, "sha512-zJVFL1EWfKtE0z2VN6qfpn/a+qG1viEzcwJA0EjtzS76ONSE3sEyWBwEbo32hS4IFw/EWVuWN+8b89aPW6It2A=="],
+
+    "minimist": ["minimist@1.2.8", "", {}, "sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA=="],
+
+    "wake_on_lan": ["wake_on_lan@1.0.0", "", { "dependencies": { "minimist": "^1.2.0" }, "bin": { "wake": "./wake" } }, "sha512-0QSpxny0QmsssshI6kePj6cobQPK+i8r5shfj58ZfQIUH9fUTyAaYPqZO3W/Ai7mN4vQVdTdsSGIr20M81UL6Q=="],
+  }
+}

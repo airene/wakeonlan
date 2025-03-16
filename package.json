@@ -1,0 +1,11 @@
+{
+  "name": "wakeonlan",
+  "module": "server.js",
+  "type": "module",
+  "private": true,
+  "devDependencies": {},
+  "dependencies": {
+    "dgram": "^1.0.1",
+    "wake_on_lan": "^1.0.0"
+  }
+}

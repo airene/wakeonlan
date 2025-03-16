@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>Wake on LAN</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+<h1>Wake on LAN</h1>
+<button onclick="wakeComputer()">Wake Computer</button>
+<p id="status"></p>
+
+<script>
+    async function wakeComputer() {
+        const status = document.getElementById('status');
+        status.textContent = 'Sending wake signal...';
+
+        try {
+            const response = await fetch('/wake', { method: 'POST' });
+            status.textContent = await response.text();
+        } catch (error) {
+            status.textContent = 'Error: ' + error.message;
+        }
+    }
+</script>
+</body>
+</html>
