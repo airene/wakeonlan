@@ -15,6 +15,10 @@ function wakeOnLan(macAddress, ipAddress = "255.255.255.255", port = 9) {
 
     // 创建UDP socket并发送数据包
     const socket = createSocket("udp4");
+
+    socket.once('listening', function() {
+        socket.setBroadcast(true)
+    });
     socket.send(packet, 0, packet.length, port, ipAddress, (err) => {
         if (err) {
             console.error("UDP send error:", err);
@@ -38,10 +42,7 @@ serve({
         if (req.method === "POST" && req.url.endsWith("/wake")) {
             try {
                 const targetMac = "48:21:0b:3e:19:f0"; // 替换为目标MAC地址
-                const targetIp = "192.168.1.2";     // 替换为目标IP
-                var wol = require('wake_on_lan');
-                wol.wake(targetMac)
-                //wakeOnLan(targetMac, targetIp);
+                wakeOnLan(targetMac);
                 return new Response("Wake signal sent successfully", {
                     status: 200,
                 });
