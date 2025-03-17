@@ -31,15 +31,21 @@ function wakeOnLan(macAddress, ipAddress = "255.255.255.255", port = 9) {
 serve({
     port: 9878,
     async fetch(req) {
-        if (req.method === "GET" && req.url.endsWith("/")) {
+        const url = new URL(req.url, `http://${req.headers.get("host")}`);
+        const favicon = await Bun.file("favicon.ico").arrayBuffer();
+        if (req.method === "GET" && url.pathname === "/") {
             // 读取并返回 index.html 文件
             const htmlFile = await Bun.file("index.html").text();
             return new Response(htmlFile, {
                 headers: {"Content-Type": "text/html"},
             });
         }
-
-        if (req.method === "POST" && req.url.endsWith("/wake")) {
+        if (req.method === "GET" && url.pathname === "/favicon.ico") {
+            return favicon
+                ? new Response(favicon, {headers: {"Content-Type": "image/x-icon"}})
+                : new Response("Favicon not found", {status: 404});
+        }
+        if (req.method === "POST" && url.pathname === "/wake") {
             try {
                 let computers = {
                     nas: "48:21:0b:3e:19:f0",

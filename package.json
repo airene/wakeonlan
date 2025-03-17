@@ -4,7 +4,6 @@
   "type": "module",
   "private": true,
   "devDependencies": {
-    "bun-types": "^1.2.5"
   },
   "dependencies": {}
 }
