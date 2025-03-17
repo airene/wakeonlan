@@ -1,9 +1,8 @@
 // server.js
 import {serve} from "bun";
-import {createSocket} from "node:dgram";
 
 // WOL实现函数
-function wakeOnLan(macAddress, ipAddress = "255.255.255.255", port = 9) {
+async function wakeOnLan(macAddress, ipAddress = "255.255.255.255", port = 9) {
     const macBytes = macAddress.split(/[:-]/).map(x => parseInt(x, 16));
 
     // 创建WOL magic packet
@@ -14,23 +13,15 @@ function wakeOnLan(macAddress, ipAddress = "255.255.255.255", port = 9) {
     }
 
     // 创建UDP socket并发送数据包
-    const socket = createSocket("udp4");
-
-    socket.once('listening', function () {
-        socket.setBroadcast(true)
-    });
-    socket.send(packet, 0, packet.length, port, ipAddress, (err) => {
-        if (err) {
-            console.error("UDP send error:", err);
-        }
-        socket.close();
-    });
+    const socket = await Bun.udpSocket({});
+    socket.setBroadcast(true);
+    socket.send(packet, port, ipAddress);
+    socket.close();
 }
 
 // 服务端
 serve({
-    port: 9878,
-    async fetch(req) {
+    port: 9878, async fetch(req) {
         const url = new URL(req.url, `http://${req.headers.get("host")}`);
         const favicon = await Bun.file("favicon.ico").arrayBuffer();
         if (req.method === "GET" && url.pathname === "/") {
@@ -41,18 +32,15 @@ serve({
             });
         }
         if (req.method === "GET" && url.pathname === "/favicon.ico") {
-            return favicon
-                ? new Response(favicon, {headers: {"Content-Type": "image/x-icon"}})
-                : new Response("Favicon not found", {status: 404});
+            return favicon ? new Response(favicon, {headers: {"Content-Type": "image/x-icon"}}) : new Response("Favicon not found", {status: 404});
         }
         if (req.method === "POST" && url.pathname === "/wake") {
             try {
                 let computers = {
-                    nas: "48:21:0b:3e:19:f0",
-                    win: "58:11:22:AE:82:57"
+                    nas: "48:21:0b:3e:19:f0", win: "58:11:22:AE:82:57"
                 }
                 let computer = await req.json().then(data => data);
-                wakeOnLan(computers[computer.host]);
+                await wakeOnLan(computers[computer.host]);
                 return new Response("Wake signal has sent!", {
                     status: 200,
                 });
