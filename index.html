@@ -1,24 +1,67 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <title>Wake on LAN</title>
+    <title>wakeonlan</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        button { padding: 10px 20px; cursor: pointer; }
+        * {
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            padding-top: 40px;
+            color: #666;
+            font: normal 14px "Helvetica Neue", 'PingFang SC', 'Microsoft Yahei', sans-serif;
+        }
+
+        main {
+            width: 1000px;
+        }
+
+        h1 {
+            font-size: 24px;
+            border-bottom: 1px solid #ddd;
+            padding: 0 0 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            color: #06f;
+        }
+
+        .btn {
+            padding: 7px 12px;
+            background: #fff;
+            color: #666;
+            border: 1px solid #666;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
     </style>
 </head>
 <body>
-<h1>Wake on LAN</h1>
-<button onclick="wakeComputer()">Wake Computer</button>
-<p id="status"></p>
-
+<main>
+    <h1>wakeonlan</h1>
+    <button class="btn" onclick="wakeComputer('nas')" style="margin-right: 7px">Nas</button>
+    <button class="btn" onclick="wakeComputer('win')">Winsows</button>
+    <p id="status" style="padding-top: 30px"></p>
+</main>
 <script>
-    async function wakeComputer() {
+    async function wakeComputer(host) {
         const status = document.getElementById('status');
         status.textContent = 'Sending wake signal...';
 
         try {
-            const response = await fetch('/wake', { method: 'POST' });
+            const response = await fetch('/wake', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    host: host
+                }),
+            });
             status.textContent = await response.text();
         } catch (error) {
             status.textContent = 'Error: ' + error.message;

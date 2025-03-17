@@ -1,6 +1,6 @@
 // server.js
 import {serve} from "bun";
-import {createSocket} from "dgram";
+import {createSocket} from "node:dgram";
 
 // WOL实现函数
 function wakeOnLan(macAddress, ipAddress = "255.255.255.255", port = 9) {
@@ -16,7 +16,7 @@ function wakeOnLan(macAddress, ipAddress = "255.255.255.255", port = 9) {
     // 创建UDP socket并发送数据包
     const socket = createSocket("udp4");
 
-    socket.once('listening', function() {
+    socket.once('listening', function () {
         socket.setBroadcast(true)
     });
     socket.send(packet, 0, packet.length, port, ipAddress, (err) => {
@@ -29,7 +29,7 @@ function wakeOnLan(macAddress, ipAddress = "255.255.255.255", port = 9) {
 
 // 服务端
 serve({
-    port: 3000,
+    port: 9878,
     async fetch(req) {
         if (req.method === "GET" && req.url.endsWith("/")) {
             // 读取并返回 index.html 文件
@@ -41,9 +41,13 @@ serve({
 
         if (req.method === "POST" && req.url.endsWith("/wake")) {
             try {
-                const targetMac = "48:21:0b:3e:19:f0"; // 替换为目标MAC地址
-                wakeOnLan(targetMac);
-                return new Response("Wake signal sent successfully", {
+                let computers = {
+                    nas: "48:21:0b:3e:19:f0",
+                    win: "58:11:22:AE:82:57"
+                }
+                let computer = await req.json().then(data => data);
+                wakeOnLan(computers[computer.host]);
+                return new Response("Wake signal has sent!", {
                     status: 200,
                 });
             } catch (error) {
@@ -57,4 +61,4 @@ serve({
     },
 });
 
-console.log("Server running at http://localhost:3000");
+console.log("Server running at http://localhost:9878");
