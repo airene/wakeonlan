@@ -1,7 +1,7 @@
 import indexPage from "./index.html";
 const server = Bun.serve({
         port: 9878,
-        //development: true,
+        development: false,
         routes: {
             "/": indexPage,
             "/favicon.ico": new Response(await Bun.file("./favicon.ico").bytes(), {
