@@ -29,7 +29,7 @@ const server = Bun.serve({
                 }
             }
         },
-        fetch(request) {
+        fetch() {
             return new Response("Not Found");
         },
     })
