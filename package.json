@@ -1,9 +1,10 @@
 {
   "name": "wakeonlan",
-  "module": "server.js",
+  "module": "server.ts",
   "type": "module",
   "private": true,
   "devDependencies": {
+    "@types/bun": "^1.2.5"
   },
   "dependencies": {}
 }
