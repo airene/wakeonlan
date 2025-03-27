@@ -1,6 +1,6 @@
 {
   "name": "wakeonlan",
-  "module": "server.ts",
+  "module": "server.js",
   "type": "module",
   "private": true,
   "devDependencies": {

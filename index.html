@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <title>wakeonlan</title>
+    <title>WakeOnLan</title>
     <style>
         * {
             margin: 0;
@@ -13,60 +13,129 @@
             justify-content: center;
             padding-top: 40px;
             color: #666;
+            background: #181818;
             font: normal 14px "Helvetica Neue", 'PingFang SC', 'Microsoft Yahei', sans-serif;
         }
 
-        main {
+        div {
             width: 1000px;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        .container .host:first-child {
+            margin-left: 0;
         }
 
         h1 {
             font-size: 24px;
-            border-bottom: 1px solid #ddd;
-            padding: 0 0 8px;
-            margin-bottom: 20px;
+            border-bottom: 1px solid #444;
+            padding: 0 0 12px;
+            margin-bottom: 30px;
             font-weight: 500;
-            color: #06f;
+            color: #F7BA1E;
         }
 
-        .btn {
-            padding: 7px 12px;
-            background: #fff;
-            color: #666;
-            border: 1px solid #666;
+        .host {
+            width: 120px;
+            border-radius: 5px;
+            display: flex;
+            height: 36px;
+            margin-left: 36px;
+            border: 1px solid #444;
+        }
+
+        .host.blink {
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0% {
+                box-shadow: 0 0 6px 3px rgba(247, 186, 30, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 4px 2px rgba(247, 186, 3, 0.2);
+            }
+            100% {
+                box-shadow: 0 0 6px 3px rgba(247, 186, 3, 0.4);
+            }
+        }
+
+        .host .status {
+            border-radius: 20px;
+            width: 8px;
+            height: 8px;
+            margin: auto 0 auto 15px;
+            background: #666;
+            flex-shrink: 0;
+        }
+
+        .host .status.online {
+            background: #23C343;
+        }
+
+        .host .btn {
+            height: 100%;
+            background: transparent;
+            color: #ccc;
+            flex: 1;
+            border: none;
             border-radius: 5px;
             cursor: pointer;
         }
 
     </style>
+
 </head>
 <body>
-<main>
-    <h1>wakeonlan</h1>
-    <button class="btn" onclick="wakeComputer('nas')" style="margin-right: 7px">Nas</button>
-    <button class="btn" onclick="wakeComputer('win')">Windows</button>
-    <p id="status" style="padding-top: 30px"></p>
-</main>
-<script>
-    async function wakeComputer(host) {
-        const status = document.getElementById('status');
-        status.textContent = 'Sending wake signal...';
 
-        try {
-            const response = await fetch('/wake', {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    host: host
-                }),
-            });
-            status.textContent = await response.text();
-        } catch (error) {
-            status.textContent = 'Error: ' + error.message;
+<div id="app">
+    <h1>Wake On Lan</h1>
+    <div class="container">
+        <template v-for="(item,key) in hosts">
+<!--            <div :class="`host ${currentHost === key && loading && 'blink'}`">-->
+            <div :class="{host:true,blink:currentHost === key && loading}">
+<!--                <div :class="`status ${item.status && 'online'} `"></div>-->
+                <div :class="{status:true,online:item.status}"></div>
+                <button class="btn" @click="wakeComputer(`${key}`)">{{item.id}}</button>
+            </div>
+        </template>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.5.13/vue.global.prod.min.js"></script>
+<script>
+
+    const {createApp, ref} = Vue
+    createApp({
+        setup() {
+            let hosts = ref({})
+            fetch('/hosts').then(res => res.json()).then(data => hosts.value = data)
+            let loading = ref(false)
+            let currentHost = ref("")
+            const wakeComputer = (host) => {
+                loading.value = true
+                currentHost.value = host
+                fetch('/wake', {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        host: host
+                    }),
+                }).then(res => res.json()).then(data => hosts.value[host].status = data.status).finally(() => {
+                    loading.value = false
+                    currentHost.value = ''
+                });
+            }
+            return {
+                hosts, wakeComputer, loading, currentHost
+            }
         }
-    }
+    }).mount('#app')
+
 </script>
 </body>
 </html>
