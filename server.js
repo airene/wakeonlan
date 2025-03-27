@@ -9,7 +9,8 @@ const servers = {
                 '48:21:0b:3e:19:f0',
             ip:
                 '192.168.1.2',
-            status: false
+            status: false,
+            loading:false
         }
     ,
     widows:
@@ -19,7 +20,8 @@ const servers = {
                 '58:11:22:AE:82:57',
             ip:
                 '192.168.1.20',
-            status: false
+            status: false,
+            loading:false
         }
     ,
 }

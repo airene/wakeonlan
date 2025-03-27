@@ -66,7 +66,7 @@
                 box-shadow: 0 0 6px 3px rgba(247, 186, 30, 0.4);
             }
             50% {
-                background: #CC9213;
+                background: #774B04;
                 box-shadow: 0 0 4px 2px rgba(247, 186, 3, 0.2);
             }
             100% {
@@ -99,7 +99,7 @@
     <div class="container">
         <template v-for="(item,key) in hosts">
             <div class="host">
-                <div :class="{status:true,online:item.status,blink:currentHost === key && loading}"></div>
+                <div :class="{status:true,online:item.status,blink:currentHost === key && item.loading}"></div>
                 <button class="btn" @click="wakeComputer(`${key}`)">{{item.id}}</button>
             </div>
         </template>
@@ -116,11 +116,10 @@
         setup() {
             let hosts = ref({})
             fetch('/hosts').then(res => res.json()).then(data => hosts.value = data)
-            let loading = ref(false)
             let currentHost = ref("")
             const wakeComputer = (host) => {
-                loading.value = true
                 currentHost.value = host
+                hosts.value[host].loading = true
                 fetch('/wake', {
                     method: 'POST',
                     headers: {
@@ -130,12 +129,12 @@
                         host: host
                     }),
                 }).then(res => res.json()).then(data => hosts.value[host].status = data.status).finally(() => {
-                    loading.value = false
+                    hosts.value[host].loading = false
                     currentHost.value = ''
                 });
             }
             return {
-                hosts, wakeComputer, loading, currentHost
+                hosts, wakeComputer, currentHost
             }
         }
     }).mount('#app')
