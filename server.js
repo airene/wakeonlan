@@ -39,7 +39,7 @@ const server = Bun.serve({
 
                         let params = await req.json();
                         await wakeOnLan(servers[params.host].mac);
-                        let res = await checkHostStatus((servers[params.host].ip), 2000)
+                        let res = await waitForHostOnline((servers[params.host].ip))
                         return new Response(JSON.stringify({status: res}), {
                             headers: {
                                 "Content-Type": "application/json" // 设置响应头为 JSON 格式
@@ -58,7 +58,7 @@ const server = Bun.serve({
                 async GET() {
                     try {
                         for (let key in servers) {
-                            servers[key].status = await checkHostStatus(servers[key].ip, 500)
+                            servers[key].status = await checkHostStatus(servers[key].ip)
                         }
                         return new Response(JSON.stringify(servers), {
                             headers: {
@@ -96,16 +96,29 @@ async function wakeOnLan(macAddress, ipAddress = "255.255.255.255", port = 9) {
     socket.close();
 }
 
-async function checkHostStatus(ip, timeout) {
+async function checkHostStatus(ip) {
     try {
         const result = await Promise.race([
             $`ping -c 1 ${ip}`.quiet(),
-            Bun.sleep(timeout).then(() => {
-                throw new Error('Timeout')
+            Bun.sleep(500).then(() => {
+                return false
             })
         ]);
         return result.exitCode === 0 && result.stdout.includes('1 packets received');
     } catch (error) {
         return false;
     }
+}
+
+async function waitForHostOnline(ip, interval = 1000, maxAttempts = 10) {
+    let attempts = 0;
+    while (attempts < maxAttempts) {
+        const isOnline = await checkHostStatus(ip);
+        if (isOnline) {
+            return true;
+        }
+        attempts++;
+        await new Promise(resolve => setTimeout(resolve, interval));
+    }
+    return false;
 }
