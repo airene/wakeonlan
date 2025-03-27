@@ -98,8 +98,8 @@
     <h1>Wake On Lan</h1>
     <div class="container">
         <template v-for="(item,key) in hosts">
-            <div :class="{host:true,blink:currentHost === key && loading}">
-                <div :class="{status:true,online:item.status,blink:true}"></div>
+            <div class="host">
+                <div :class="{status:true,online:item.status,blink:currentHost === key && loading}"></div>
                 <button class="btn" @click="wakeComputer(`${key}`)">{{item.id}}</button>
             </div>
         </template>
