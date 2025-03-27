@@ -99,7 +99,7 @@
     <div class="container">
         <template v-for="(item,key) in hosts">
             <div class="host">
-                <div :class="{status:true,online:item.status,blink:currentHost === key && item.loading}"></div>
+                <div :class="{status:true,online:item.status,blink: item.loading}"></div>
                 <button class="btn" @click="wakeComputer(`${key}`)">{{item.id}}</button>
             </div>
         </template>
@@ -116,9 +116,7 @@
         setup() {
             let hosts = ref({})
             fetch('/hosts').then(res => res.json()).then(data => hosts.value = data)
-            let currentHost = ref("")
             const wakeComputer = (host) => {
-                currentHost.value = host
                 hosts.value[host].loading = true
                 fetch('/wake', {
                     method: 'POST',
@@ -130,11 +128,10 @@
                     }),
                 }).then(res => res.json()).then(data => hosts.value[host].status = data.status).finally(() => {
                     hosts.value[host].loading = false
-                    currentHost.value = ''
                 });
             }
             return {
-                hosts, wakeComputer, currentHost
+                hosts, wakeComputer
             }
         }
     }).mount('#app')
