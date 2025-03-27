@@ -47,22 +47,6 @@
             border: 1px solid #444;
         }
 
-        .host.blink {
-            animation: blink 1.5s infinite;
-        }
-
-        @keyframes blink {
-            0% {
-                box-shadow: 0 0 6px 3px rgba(247, 186, 30, 0.4);
-            }
-            50% {
-                box-shadow: 0 0 4px 2px rgba(247, 186, 3, 0.2);
-            }
-            100% {
-                box-shadow: 0 0 6px 3px rgba(247, 186, 3, 0.4);
-            }
-        }
-
         .host .status {
             border-radius: 20px;
             width: 8px;
@@ -70,6 +54,25 @@
             margin: auto 0 auto 15px;
             background: #666;
             flex-shrink: 0;
+        }
+
+        .host .status.blink {
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0% {
+                background: #CC9213;
+                box-shadow: 0 0 6px 3px rgba(247, 186, 30, 0.4);
+            }
+            50% {
+                background: #CC9213;
+                box-shadow: 0 0 4px 2px rgba(247, 186, 3, 0.2);
+            }
+            100% {
+                background: #CC9213;
+                box-shadow: 0 0 6px 3px rgba(247, 186, 3, 0.4);
+            }
         }
 
         .host .status.online {
@@ -95,13 +98,14 @@
     <h1>Wake On Lan</h1>
     <div class="container">
         <template v-for="(item,key) in hosts">
-<!--            <div :class="`host ${currentHost === key && loading && 'blink'}`">-->
             <div :class="{host:true,blink:currentHost === key && loading}">
-<!--                <div :class="`status ${item.status && 'online'} `"></div>-->
-                <div :class="{status:true,online:item.status}"></div>
+                <div :class="{status:true,online:item.status,blink:true}"></div>
                 <button class="btn" @click="wakeComputer(`${key}`)">{{item.id}}</button>
             </div>
         </template>
+<!--        <div class="host">
+            <div class="status blink"></div>
+        </div>-->
     </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.5.13/vue.global.prod.min.js"></script>
