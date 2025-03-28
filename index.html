@@ -17,7 +17,7 @@
             font: normal 14px "Helvetica Neue", 'PingFang SC', 'Microsoft Yahei', sans-serif;
         }
 
-        div {
+        main {
             width: 1000px;
         }
 
@@ -94,20 +94,20 @@
 </head>
 <body>
 
-<div id="app">
+<main id="app">
     <h1>Wake On Lan</h1>
     <div class="container">
         <template v-for="(item,key) in hosts">
             <div class="host">
                 <div :class="{status:true,online:item.status,blink: item.loading}"></div>
-                <button class="btn" @click="wakeComputer(`${key}`)">{{item.id}}</button>
+                <button class="btn" @click="wakeComputer(`${key}`)">{{item.label}}</button>
             </div>
         </template>
-<!--        <div class="host">
-            <div class="status blink"></div>
-        </div>-->
+        <!--        <div class="host">
+                    <div class="status blink"></div>
+                </div>-->
     </div>
-</div>
+</main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.5.13/vue.global.prod.min.js"></script>
 <script>
 

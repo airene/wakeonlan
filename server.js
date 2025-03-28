@@ -17,51 +17,43 @@ const servers = {
         loading: false
     },
 }
+
 const server = Bun.serve({
-        port: 9878,
-        development: false,
-        routes: {
-            "/": indexPage,
-            "/favicon.ico": new Response(await Bun.file("./favicon.ico").bytes(), {
-                headers: {
-                    "Content-Type": "image/x-icon",
-                },
-            }),
-            "/hosts": {
-                async GET() {
-                    try {
-                        for (let key in servers) {
-                            servers[key].status = await checkHostStatus(servers[key].ip)
-                        }
-                        return new Response(JSON.stringify(servers), {
-                            headers: {"Content-Type": "application/json"}
-                        })
-                    } catch (error) {
-                        return new Response(`Failed to check status: ${error.message}`, {status: 500})
+    port: 9878,
+    development: false,
+    routes: {
+        "/": indexPage,
+        "/favicon.ico": new Response(await Bun.file("./favicon.ico").bytes(), {headers: {"Content-Type": "image/x-icon",},}),
+        "/hosts": {
+            async GET() {
+                try {
+                    for (let key in servers) {
+                        servers[key].status = await checkHostStatus(servers[key].ip)
                     }
+                    return Response.json(servers)
+
+                } catch (error) {
+                    return Response.json({status: 500})
                 }
-            },
-            "/wake": {
-                async POST(req) {
-                    try {
-                        let params = await req.json()
-                        await wakeOnLan(servers[params.host].mac)
-                        let res = await waitForHostOnline((servers[params.host].ip))
-                        return new Response(JSON.stringify({status: res}), {
-                            headers: {"Content-Type": "application/json"}
-                        })
-                    } catch (error) {
-                        return new Response(JSON.stringify({status: false}), {
-                            headers: {"Content-Type": "application/json"}
-                        })
-                    }
+            }
+        },
+        "/wake": {
+            async POST(req) {
+                try {
+                    let params = await req.json()
+                    await wakeOnLan(servers[params.host].mac)
+                    let res = await waitForHostOnline((servers[params.host].ip))
+                    return Response.json({status: res})
+                } catch (error) {
+                    return Response.json({status: false})
                 }
-            },
+            }
         },
-        fetch() {
-            return new Response("Not Found")
-        },
-    })
+    },
+    fetch() {
+        return new Response("Not Found")
+    },
+})
 console.log(`Server running at ${server.url}`)
 
 // wol
